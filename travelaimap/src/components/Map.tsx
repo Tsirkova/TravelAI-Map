@@ -55,22 +55,6 @@ export default function MapComponent({
     }
   }, [selectedPlace]);
 
-  // Функция для удаления места
-  const handleDeletePlace = async (placeId: string) => {
-    try {
-      await deleteDoc(doc(db, 'places', placeId));
-      setPlaces(places.filter(place => place.id !== placeId));
-      setSelectedPlace(null); // Закрываем карточку после удаления
-    } catch (error) {
-      setError('Ошибка при удалении места');
-      console.error(error);
-    }
-  };
-
-  const handlePlaceClick = (place: Place) => {
-    setSelectedPlace(place);
-  };
-
   return (
     <div className="flex-1 relative w-2/3">
       <MapContainer 
