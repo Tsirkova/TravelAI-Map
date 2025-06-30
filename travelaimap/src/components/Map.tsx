@@ -40,8 +40,6 @@ export default function MapComponent({
   userLocation,
   places,
   onPlaceClick,
-  showForm,
-  onShowForm,
   selectedPlace
 }: MapComponentProps) {
   const mapRef = useRef<L.Map>(null);
@@ -90,15 +88,6 @@ export default function MapComponent({
           </Marker>
         ))}
       </MapContainer>
-
-      {/* Кнопка добавления нового места */}
-      <button
-        onClick={() => onShowForm(true)}
-        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full shadow-lg absolute bottom-10 right-4 z-[1000]"
-      >
-        +
-      </button>
-    
     </div>
   );
 }
