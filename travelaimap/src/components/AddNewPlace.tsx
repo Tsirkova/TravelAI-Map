@@ -112,6 +112,9 @@ export default function AddPlaceForm({ onClose, onAdd, userLocation }: AddPlaceF
                 />
                 <MapClickHandler onClick={handleMapClick} />
               </MapContainer>
+              <p className="text-sm mt-2 text-gray-600">
+                Кликните на карте, чтобы выбрать место
+              </p>
             </div>
           </div>
 
