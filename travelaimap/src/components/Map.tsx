@@ -2,8 +2,10 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
 import { useRef, useEffect } from 'react';
 import { Place } from '@/app/page';
+
 
 // Маркеры
 const userIcon = new L.Icon({
@@ -17,6 +19,7 @@ const placeIcon = new L.Icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
+
 
 const selectedIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -48,8 +51,25 @@ export default function MapComponent({
     if (selectedPlace && mapRef.current) {
       const { latitude, longitude } = selectedPlace.coordinates;
       mapRef.current.flyTo([latitude, longitude], 15);
+
     }
   }, [selectedPlace]);
+
+  // Функция для удаления места
+  const handleDeletePlace = async (placeId: string) => {
+    try {
+      await deleteDoc(doc(db, 'places', placeId));
+      setPlaces(places.filter(place => place.id !== placeId));
+      setSelectedPlace(null); // Закрываем карточку после удаления
+    } catch (error) {
+      setError('Ошибка при удалении места');
+      console.error(error);
+    }
+  };
+
+  const handlePlaceClick = (place: Place) => {
+    setSelectedPlace(place);
+  };
 
   return (
     <div className="flex-1 relative w-2/3">
@@ -63,6 +83,7 @@ export default function MapComponent({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
+
 
         {/* Текущее местоположение пользователя */}
         <Marker position={userLocation} icon={userIcon}>
@@ -93,6 +114,7 @@ export default function MapComponent({
       >
         +
       </button>
+    
     </div>
   );
 }
