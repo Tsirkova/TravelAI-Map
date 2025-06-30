@@ -12,17 +12,6 @@ const selectIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
-interface EditPlaceFormProps {
-  place: Place;
-  onClose: () => void;
-  onSave: (place: { 
-    id: string;
-    name: string; 
-    coordinates: GeoPoint; 
-    description?: string 
-  }) => Promise<void> | void;
-}
-
 function MapClickHandler({ onClick }: { onClick: (latlng: L.LatLng) => void }) {
   useMapEvents({
     click: (e) => {
@@ -30,6 +19,17 @@ function MapClickHandler({ onClick }: { onClick: (latlng: L.LatLng) => void }) {
     },
   });
   return null;
+}
+
+interface EditPlaceFormProps {
+  place: Place;
+  onClose: () => void;
+  onSave: (updatedPlace: {
+    id: string;
+    name: string;
+    coordinates: GeoPoint;
+    description?: string;
+  }) => void;
 }
 
 export default function EditPlaceForm({ place, onClose, onSave }: EditPlaceFormProps) {
@@ -75,7 +75,7 @@ export default function EditPlaceForm({ place, onClose, onSave }: EditPlaceFormP
   }, [selectedLocation]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
+    <div className="fixed inset-0  flex items-center justify-center z-[1000]">
       <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
         <h2 className="text-xl font-bold mb-4">Редактировать место</h2>
         <form onSubmit={handleSubmit}>

@@ -230,6 +230,7 @@ export default function TravelMapPage() {
           userLocation={{ lat: userLocation[0], lng: userLocation[1] }}
         />
       )}
+      
     </div>
   );
 }

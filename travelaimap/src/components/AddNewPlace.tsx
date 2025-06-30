@@ -65,7 +65,7 @@ export default function AddPlaceForm({ onClose, onAdd, userLocation }: AddPlaceF
   }, [userLocation]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
+    <div className="fixed inset-0 flex items-center justify-center z-[1000]">
       <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
         <h2 className="text-xl font-bold mb-4">Добавить новое место</h2>
         <form onSubmit={handleSubmit}>
