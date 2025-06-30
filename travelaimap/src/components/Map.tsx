@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css';
 import { collection, getDocs, GeoPoint } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useState, useEffect } from 'react';
+import { addDoc } from 'firebase/firestore';
+import AddNewPlace from './AddNewPlace';
 
 // Маркеры
 const userIcon = new L.Icon({
@@ -30,6 +32,7 @@ export default function Map() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false)
 
   // Геолокация
   useEffect(() => {
@@ -69,6 +72,29 @@ export default function Map() {
 
   if (loading) return <div className="flex items-center justify-center h-screen">Загрузка...</div>;
 
+  // Функция для добавления места
+  const handleAddPlace = async (placeData: {
+    name: string;
+    coordinates: GeoPoint;
+    description?: string;
+  }) => {
+    try {
+      await addDoc(collection(db, 'places'), placeData);
+      // Обновляем список мест
+      const querySnapshot = await getDocs(collection(db, 'places'));
+      const updatedPlaces = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name,
+        coordinates: doc.data().coordinates,
+        description: doc.data().description
+      }));
+      setPlaces(updatedPlaces);
+    } catch (error) {
+      setError('Ошибка при добавлении места');
+      console.error(error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <header className="bg-blue-600 text-white p-4 shadow-md">
@@ -101,13 +127,20 @@ export default function Map() {
             </Marker>
           ))}
         </MapContainer>
-
         <button
-          onClick={() => window.location.reload()}
-          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full shadow-lg absolute bottom-4 right-4 z-[1000]"
+          onClick={() => setShowForm(true)}
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full shadow-lg absolute bottom-10 right-4 z-[1000]"
         >
-          Обновить
+          +
         </button>
+
+        {showForm && (
+          <AddNewPlace
+            onClose={() => setShowForm(false)}
+            onAdd={handleAddPlace}
+            userLocation={{ lat: userLocation[0], lng: userLocation[1] }}
+          />
+        )}
       </div>
     </div>
   );
