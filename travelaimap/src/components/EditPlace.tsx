@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Place } from '@/app/page';
 
 const selectIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -11,10 +12,15 @@ const selectIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
-interface AddPlaceFormProps {
+interface EditPlaceFormProps {
+  place: Place;
   onClose: () => void;
-  onAdd: (place: { name: string; coordinates: GeoPoint; description?: string }) => Promise<void> | void;
-  userLocation: { lat: number; lng: number };
+  onSave: (place: { 
+    id: string;
+    name: string; 
+    coordinates: GeoPoint; 
+    description?: string 
+  }) => Promise<void> | void;
 }
 
 function MapClickHandler({ onClick }: { onClick: (latlng: L.LatLng) => void }) {
@@ -26,10 +32,13 @@ function MapClickHandler({ onClick }: { onClick: (latlng: L.LatLng) => void }) {
   return null;
 }
 
-export default function AddPlaceForm({ onClose, onAdd, userLocation }: AddPlaceFormProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState(userLocation);
+export default function EditPlaceForm({ place, onClose, onSave }: EditPlaceFormProps) {
+  const [name, setName] = useState(place.name);
+  const [description, setDescription] = useState(place.description || '');
+  const [selectedLocation, setSelectedLocation] = useState({
+    lat: place.coordinates.latitude,
+    lng: place.coordinates.longitude
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const mapRef = useRef<L.Map>(null);
 
@@ -45,12 +54,13 @@ export default function AddPlaceForm({ onClose, onAdd, userLocation }: AddPlaceF
     setIsSubmitting(true);
     
     try {
-      await onAdd({
+      await onSave({
+        id: place.id,
         name,
         coordinates: new GeoPoint(selectedLocation.lat, selectedLocation.lng),
         description: description || undefined
       });
-      onClose(); 
+      onClose();
     } catch (error) {
       console.error('Ошибка при сохранении:', error);
     } finally {
@@ -60,14 +70,14 @@ export default function AddPlaceForm({ onClose, onAdd, userLocation }: AddPlaceF
 
   useEffect(() => {
     if (mapRef.current) {
-      mapRef.current.flyTo([userLocation.lat, userLocation.lng]);
+      mapRef.current.flyTo([selectedLocation.lat, selectedLocation.lng]);
     }
-  }, [userLocation]);
+  }, [selectedLocation]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
       <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
-        <h2 className="text-xl font-bold mb-4">Добавить новое место</h2>
+        <h2 className="text-xl font-bold mb-4">Редактировать место</h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -97,7 +107,7 @@ export default function AddPlaceForm({ onClose, onAdd, userLocation }: AddPlaceF
 
             <div className="h-64 md:h-full">
               <MapContainer
-                center={[userLocation.lat, userLocation.lng]}
+                center={[selectedLocation.lat, selectedLocation.lng]}
                 zoom={13}
                 className="h-full w-full rounded-lg border"
                 ref={mapRef}
