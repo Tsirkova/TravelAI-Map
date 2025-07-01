@@ -13,6 +13,6 @@ const firebaseConfig = {
 };
 
 // Инициализация Firebase
-export const app = initializeApp(firebaseConfig); // Добавляем экспорт
+export const app = initializeApp(firebaseConfig); 
 export const db = getFirestore(app);
-export const auth = getAuth(app); // Добавляем auth для удобства
+export const auth = getAuth(app); 
