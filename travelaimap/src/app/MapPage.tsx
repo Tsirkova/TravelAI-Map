@@ -9,16 +9,17 @@ import {
   doc,
   deleteDoc,
   addDoc,
-  updateDoc,
+  updateDoc
 } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import MapComponent from '@/components/Map';
 import PlacesList from '@/components/PlaceList';
 import AddNewPlace from '@/components/AddNewPlace';
 import { getCityName } from '@/lib/geocoding';
+import { fetchAIRecommendations } from '@/lib/recommendation';
 
 export interface Place {
-  id: string;
+  id?: string;
   name: string;
   coordinates: GeoPoint;
   description?: string;
@@ -38,7 +39,9 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
   const [error, setError] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
 
-  // Получаем геолокацию пользователя
+  const [recommendationsNearby, setRecommendationsNearby] = useState<Place[]>([]);
+  const [recommendationsSimilar, setRecommendationsSimilar] = useState<Place[]>([]);
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -56,7 +59,6 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
     }
   }, []);
 
-  // Загружаем места текущего пользователя
   useEffect(() => {
     const loadPlaces = async () => {
       try {
@@ -79,11 +81,22 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
             coordinates: placeData.coordinates,
             description: placeData.description,
             city: placeData.city,
-            userId: placeData.userId,
+            userId: placeData.userId
           };
         });
 
         setPlaces(placesWithCities);
+
+        // AI-рекомендации
+        const { nearby, similar } = await fetch('/api/ai-recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userPlaces: placesWithCities, userLocation })
+        }).then(res => res.json());
+
+        setRecommendationsNearby(nearby);
+        setRecommendationsSimilar(similar);
+
       } catch (err) {
         setError('Ошибка загрузки мест');
         console.error(err);
@@ -97,7 +110,6 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
     }
   }, [userLocation]);
 
-  // Добавление нового места
   const handleAddPlace = async (placeData: {
     name: string;
     coordinates: GeoPoint;
@@ -115,7 +127,7 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
       await addDoc(collection(db, 'places'), {
         ...placeData,
         city,
-        userId,
+        userId
       });
 
       setShowForm(false);
@@ -126,7 +138,6 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
     }
   };
 
-  // Удаление
   const handleDeletePlace = async (placeId: string) => {
     try {
       await deleteDoc(doc(db, 'places', placeId));
@@ -138,14 +149,12 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
     }
   };
 
-  // Редактирование
   const handleUpdatePlace = async (updatedPlace: Place) => {
     try {
-      await updateDoc(doc(db, 'places', updatedPlace.id), {
+      await updateDoc(doc(db, 'places', updatedPlace.id!), {
         name: updatedPlace.name,
         coordinates: updatedPlace.coordinates,
-        description: updatedPlace.description,
-        // city не меняется
+        description: updatedPlace.description
       });
 
       const updatedPlaces = places.map((place) =>
@@ -154,9 +163,10 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
 
       setPlaces(updatedPlaces);
 
-      if (selectedPlace?.id === updatedPlace.id) {
-        setSelectedPlace({ ...updatedPlace, city: selectedPlace.city });
-      }
+      if (selectedPlace && selectedPlace.id === updatedPlace.id) {
+  setSelectedPlace({ ...updatedPlace, city: selectedPlace.city });
+}
+
     } catch (error) {
       setError('Ошибка при обновлении места');
       console.error(error);
@@ -178,7 +188,7 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
     <div className="flex flex-1 overflow-hidden h-[calc(100vh-64px)]">
       <MapComponent
         userLocation={userLocation}
-        places={places}
+        places={[...places, ...recommendationsNearby, ...recommendationsSimilar]}
         onPlaceClick={setSelectedPlace}
         showForm={showForm}
         onShowForm={setShowForm}
@@ -187,6 +197,8 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
 
       <PlacesList
         places={places}
+        recommendationsNearby={recommendationsNearby}
+        recommendationsSimilar={recommendationsSimilar}
         selectedPlace={selectedPlace}
         onSelectPlace={setSelectedPlace}
         onDeletePlace={handleDeletePlace}
