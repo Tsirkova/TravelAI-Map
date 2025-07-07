@@ -18,7 +18,7 @@ import AddNewPlace from '@/components/place/AddNewPlace';
 import { getCityName } from '@/lib/geocoding';
 
 export interface Place {
-  id?: string;
+  id: string;
   name: string;
   coordinates: GeoPoint;
   description?: string;
@@ -176,6 +176,14 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto" />
           <p className="mt-4 text-lg">Загрузка карты...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-red-500">{error}</div>
       </div>
     );
   }

@@ -10,14 +10,9 @@ interface SearchAndFilterProps {
 
 export default function SearchAndFilter({
   onSearch,
-  onFilterChange,
-  filterOptions,
-  initialFilter = 'all'
 }: SearchAndFilterProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState(initialFilter);
 
-  // Дебаунс для поиска (опционально)
   useEffect(() => {
     const timer = setTimeout(() => {
       onSearch(searchTerm);
@@ -25,11 +20,6 @@ export default function SearchAndFilter({
 
     return () => clearTimeout(timer);
   }, [searchTerm, onSearch]);
-
-  const handleFilterChange = (value: string) => {
-    setSelectedFilter(value);
-    onFilterChange(value);
-  };
 
   return (
     <div className="sticky top-0 bg-white z-10 p-4 border-b">

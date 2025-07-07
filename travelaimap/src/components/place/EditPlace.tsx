@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Place } from '@/app/page';
+import { Place } from '@/components/MapPage';
 
 const selectIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -129,14 +129,14 @@ export default function EditPlaceForm({ place, onClose, onSave }: EditPlaceFormP
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border rounded"
+              className="px-4 py-2 border rounded cursor-pointer"
               disabled={isSubmitting}
             >
               Отмена
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+              className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600 disabled:bg-blue-300"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Сохранение...' : 'Сохранить'}

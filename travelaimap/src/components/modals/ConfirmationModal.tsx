@@ -21,13 +21,13 @@ export default function ConfirmationModal({
         <div className="flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+            className="px-4 py-2 border border-gray-300 rounded cursor-pointer hover:bg-gray-100"
           >
             Отмена
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="px-4 py-2 bg-red-500 text-white rounded cursor-pointer hover:bg-red-600"
           >
             Удалить
           </button>

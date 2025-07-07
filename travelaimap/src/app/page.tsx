@@ -1,14 +1,19 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import TravelMapPage from '../components/MapPage';
-import AuthForm from '@/components/AuthForm';
-import AppHeader from '@/components/AppHeader';
-import HelpModal from '@/components/modals/HelpModal';
-import ConfirmationModal from '@/components/modals/ConfirmationModal';
+import dynamic from 'next/dynamic';
 
-export default function Page() {
+// Динамический импорт компонентов, использующих браузерные API
+const TravelMapPage = dynamic(() => import('../components/MapPage'), {
+  ssr: false,
+});
+const AuthForm = dynamic(() => import('@/components/AuthForm'), { ssr: false });
+const AppHeader = dynamic(() => import('@/components/AppHeader'), { ssr: false });
+const HelpModal = dynamic(() => import('@/components/modals/HelpModal'), { ssr: false });
+const ConfirmationModal = dynamic(() => import('@/components/modals/ConfirmationModal'), { ssr: false });
+
+function Page() {
   const [user, setUser] = useState<User | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -72,3 +77,5 @@ export default function Page() {
     </>
   );
 }
+
+export default dynamic(() => Promise.resolve(Page), { ssr: false });

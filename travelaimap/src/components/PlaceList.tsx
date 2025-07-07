@@ -43,9 +43,9 @@ export default function PlacesList({
       );
     });
 
-  const myPlaces = useMemo(() => filterPlaces(places), [places, searchTerm]);
-  const nearbyAI = useMemo(() => filterPlaces(recommendationsNearby), [recommendationsNearby, searchTerm]);
-  const similarAI = useMemo(() => filterPlaces(recommendationsSimilar), [recommendationsSimilar, searchTerm]);
+  const myPlaces = useMemo(() => filterPlaces(places), [filterPlaces, places, searchTerm]);
+  const nearbyAI = useMemo(() => filterPlaces(recommendationsNearby), [filterPlaces, recommendationsNearby, searchTerm]);
+  const similarAI = useMemo(() => filterPlaces(recommendationsSimilar), [filterPlaces, recommendationsSimilar, searchTerm]);
 
   const handleSave = async (updatedPlace: {
     id: string;
@@ -99,6 +99,30 @@ export default function PlacesList({
                     <h4 className="font-medium">{place.name}</h4>
                     <p className="text-sm text-gray-500">{place.city}</p>
                   </div>
+                  {editable && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingPlace(place);
+                        }}
+                        className="text-green-500 cursor-pointer hover:text-green-700"
+                        title="Редактировать"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(place);
+                        }}
+                        className="text-red-500 cursor-pointer hover:text-red-700"
+                        title="Удалить"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
                 </div>
               </li>
             ))}
@@ -143,7 +167,7 @@ export default function PlacesList({
             <div className="flex justify-between items-start mb-3">
               <button
                 onClick={() => onSelectPlace(null)}
-                className="text-blue-500 hover:text-blue-700"
+                className="text-blue-500 cursor-pointer hover:text-blue-700"
               >
                 ← Назад к списку
               </button>
@@ -151,14 +175,14 @@ export default function PlacesList({
                 <div className="flex gap-2">
                   <button
                     onClick={() => setEditingPlace(selectedPlace)}
-                    className="text-green-500 hover:text-green-700"
+                    className="text-green-500 cursor-pointer hover:text-green-700"
                     title="Редактировать"
                   >
                     ✏️
                   </button>
                   <button
                     onClick={() => handleDeleteClick(selectedPlace)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 cursor-pointer hover:text-red-700"
                     title="Удалить"
                   >
                     🗑️

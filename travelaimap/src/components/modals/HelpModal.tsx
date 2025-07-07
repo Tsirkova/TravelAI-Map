@@ -11,7 +11,7 @@ export default function HelpModal({ onClose }: HelpModalProps) {
       <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-black"
+          className="absolute top-2 right-2 text-gray-500 cursor-pointer hover:text-black"
         >
           ✖
         </button>

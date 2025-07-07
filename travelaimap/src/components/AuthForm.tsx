@@ -22,8 +22,8 @@ export default function AuthForm() {
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
     }
   };
 
@@ -50,7 +50,7 @@ export default function AuthForm() {
           required
         />
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
-        <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+        <button className="w-full bg-blue-500 text-white py-2 rounded cursor-pointer hover:bg-blue-600">
           {isLogin ? 'Войти' : 'Зарегистрироваться'}
         </button>
       </form>
@@ -58,7 +58,7 @@ export default function AuthForm() {
         {isLogin ? 'Нет аккаунта?' : 'Уже зарегистрированы?'}{' '}
         <button
           onClick={() => setIsLogin(!isLogin)}
-          className="text-blue-500 underline"
+          className="text-blue-500 cursor-pointer underline"
         >
           {isLogin ? 'Регистрация' : 'Вход'}
         </button>
@@ -71,7 +71,7 @@ export default function AuthForm() {
             console.error('Ошибка анонимного входа:', err);
           }
         }}
-        className="mt-4 w-full text-sm text-gray-600 underline"
+        className="mt-4 w-full text-sm text-gray-600 cursor-pointer underline"
       >
         Продолжить без входа
       </button>
