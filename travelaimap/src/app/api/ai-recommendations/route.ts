@@ -1,4 +1,3 @@
-// ✅ API route for AI recommendations via OpenRouter
 import { NextRequest, NextResponse } from 'next/server';
 import { Place } from '@/components/MapPage';
 
@@ -16,7 +15,7 @@ export async function POST(req: NextRequest) {
       headers: {
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'http://localhost:3000/', // 🧠 замени на свой домен
+        'HTTP-Referer': 'http://localhost:3000/',
         'X-Title': 'TravelAI Map'
       },
       body: JSON.stringify({
