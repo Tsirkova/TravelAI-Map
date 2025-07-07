@@ -1,4 +1,21 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Стили для Leaflet */
+.leaflet-container {
+  height: 100vh; /* На всю высоту экрана */
+  width: 100%;
+  z-index: 0; /* Чтобы не перекрывал другие элементы */
+}
+
+/* Фикс для иконки маркера */
+.leaflet-marker-icon {
+  background-image: url('https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
 
 :root {
   --background: #ffffff;
@@ -11,13 +28,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
