@@ -1,9 +1,9 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { GeoPoint } from 'firebase/firestore';
-import { Place } from '@/app/MapPage';
-import EditPlaceForm from './EditPlace';
-import ConfirmationModal from './ConfirmationModal';
+import { Place } from '@/components/MapPage';
+import EditPlaceForm from './place/EditPlace';
+import ConfirmationModal from './modals/ConfirmationModal';
 
 interface PlacesListProps {
   places: Place[];
@@ -176,10 +176,6 @@ export default function PlacesList({
                 <p className="text-gray-700">{selectedPlace.description}</p>
               </div>
             )}
-            <div className="mt-2 text-sm text-gray-500">
-              Координаты:{' '}
-              {selectedPlace.coordinates.latitude.toFixed(4)}, {selectedPlace.coordinates.longitude.toFixed(4)}
-            </div>
           </div>
         ) : (
           <>

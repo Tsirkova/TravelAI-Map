@@ -1,6 +1,6 @@
 // ✅ API route for AI recommendations via OpenRouter
 import { NextRequest, NextResponse } from 'next/server';
-import { Place } from '@/app/MapPage';
+import { Place } from '@/components/MapPage';
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY!;
 const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';

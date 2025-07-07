@@ -14,9 +14,8 @@ import {
 import { auth, db } from '@/lib/firebase';
 import MapComponent from '@/components/Map';
 import PlacesList from '@/components/PlaceList';
-import AddNewPlace from '@/components/AddNewPlace';
+import AddNewPlace from '@/components/place/AddNewPlace';
 import { getCityName } from '@/lib/geocoding';
-import { fetchAIRecommendations } from '@/lib/recommendation';
 
 export interface Place {
   id?: string;
@@ -38,11 +37,10 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
-
   const [recommendationsNearby, setRecommendationsNearby] = useState<Place[]>([]);
   const [recommendationsSimilar, setRecommendationsSimilar] = useState<Place[]>([]);
 
-  useEffect(() => {
+  const getGeoLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -57,6 +55,10 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
       setError('Геолокация не поддерживается');
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    getGeoLocation(); // начальная загрузка геолокации
   }, []);
 
   useEffect(() => {
@@ -71,10 +73,8 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
         );
 
         const querySnapshot = await getDocs(q);
-
         const placesWithCities = querySnapshot.docs.map((docSnap) => {
           const placeData = docSnap.data();
-
           return {
             id: docSnap.id,
             name: placeData.name,
@@ -87,16 +87,14 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
 
         setPlaces(placesWithCities);
 
-        // AI-рекомендации
         const { nearby, similar } = await fetch('/api/ai-recommendations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userPlaces: placesWithCities, userLocation })
-        }).then(res => res.json());
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userPlaces: placesWithCities, userLocation })
+        }).then((res) => res.json());
 
         setRecommendationsNearby(nearby);
         setRecommendationsSimilar(similar);
-
       } catch (err) {
         setError('Ошибка загрузки мест');
         console.error(err);
@@ -120,7 +118,6 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
         placeData.coordinates.latitude,
         placeData.coordinates.longitude
       );
-
       const userId = auth.currentUser?.uid;
       if (!userId) throw new Error('Не удалось получить пользователя');
 
@@ -131,7 +128,7 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
       });
 
       setShowForm(false);
-      setLoading(true); // триггер повторной загрузки
+      setLoading(true);
     } catch (error) {
       setError('Ошибка при добавлении места');
       console.error(error);
@@ -164,9 +161,8 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
       setPlaces(updatedPlaces);
 
       if (selectedPlace && selectedPlace.id === updatedPlace.id) {
-  setSelectedPlace({ ...updatedPlace, city: selectedPlace.city });
-}
-
+        setSelectedPlace({ ...updatedPlace, city: selectedPlace.city });
+      }
     } catch (error) {
       setError('Ошибка при обновлении места');
       console.error(error);
@@ -185,7 +181,8 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
   }
 
   return (
-    <div className="flex flex-1 overflow-hidden h-[calc(100vh-64px)]">
+    <div className="relative flex flex-1 overflow-hidden h-[calc(100vh-64px)]">
+
       <MapComponent
         userLocation={userLocation}
         places={[...places, ...recommendationsNearby, ...recommendationsSimilar]}

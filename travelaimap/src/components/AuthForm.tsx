@@ -1,7 +1,11 @@
 'use client';
 import { useState } from 'react';
 import { auth } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInAnonymously
+} from 'firebase/auth';
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -24,7 +28,7 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="max-w-sm mx-auto mt-20 p-6 bg-white rounded shadow">
+    <div className="max-w-sm mx-auto mt-60 p-6 bg-white rounded shadow">
       <h2 className="text-xl font-bold mb-4">
         {isLogin ? 'Вход' : 'Регистрация'}
       </h2>
@@ -59,6 +63,18 @@ export default function AuthForm() {
           {isLogin ? 'Регистрация' : 'Вход'}
         </button>
       </p>
+      <button
+        onClick={async () => {
+          try {
+            await signInAnonymously(auth);
+          } catch (err) {
+            console.error('Ошибка анонимного входа:', err);
+          }
+        }}
+        className="mt-4 w-full text-sm text-gray-600 underline"
+      >
+        Продолжить без входа
+      </button>
     </div>
   );
 }
