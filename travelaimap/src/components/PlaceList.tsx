@@ -46,6 +46,10 @@ export default function PlacesList({
   const myPlaces = useMemo(() => filterPlaces(places), [filterPlaces, places, searchTerm]);
   const nearbyAI = useMemo(() => filterPlaces(recommendationsNearby), [filterPlaces, recommendationsNearby, searchTerm]);
   const similarAI = useMemo(() => filterPlaces(recommendationsSimilar), [filterPlaces, recommendationsSimilar, searchTerm]);
+  const [openTooltips, setOpenTooltips] = useState<Record<string, boolean>>({
+  nearby: false,
+  similar: false
+}); 
 
   const handleSave = async (updatedPlace: {
     id: string;
@@ -74,24 +78,17 @@ export default function PlacesList({
     }
   };
 
-// Добавляем компонент Tooltip (можно создать отдельно или использовать готовый из библиотеки)
-const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }) => {
-  return (
-    <div className="relative group inline-flex items-center">
-      {children}
-      <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-        {text}
-        <span className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-0 border-t-4 border-gray-800 border-solid"></span>
-      </span>
-    </div>
-  );
+const toggleTooltip = (key: string) => {
+  setOpenTooltips(prev => ({
+    ...prev,
+    [key]: !prev[key]
+  }));
 };
 
-// Модифицируем renderSection для добавления подсказок
 const renderSection = (key: string, title: string, data: Place[], editable: boolean) => {
   const collapsed = collapsedSections[key];
+  const isTooltipOpen = openTooltips[key];
 
-  // Определяем текст подсказки в зависимости от раздела
   const tooltipText = 
     key === 'nearby' 
       ? 'Места, рекомендованные на основе вашей геолокации' 
@@ -108,14 +105,28 @@ const renderSection = (key: string, title: string, data: Place[], editable: bool
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">{title}</h3>
           {tooltipText && (
-            <Tooltip text={tooltipText}>
-              <span className="text-gray-400 hover:text-gray-600 cursor-help">?</span>
-            </Tooltip>
+            <div className="relative">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleTooltip(key);
+                }}
+                className="text-gray-400 hover:text-gray-600 cursor-help focus:outline-none"
+              >
+                ?
+              </button>
+              {isTooltipOpen && (
+                <div className="absolute z-10 bottom-full left-0 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded shadow-lg">
+                  {tooltipText}
+                  <div className="absolute top-full left-2 w-0 h-0 border-l-4 border-r-4 border-b-0 border-t-4 border-gray-800"></div>
+                </div>
+              )}
+            </div>
           )}
         </div>
         <span className="text-gray-500 text-sm">{collapsed ? '▼' : '▲'}</span>
       </button>
-      {/* Остальной код секции без изменений */}
+
       {!collapsed && (
         <ul className="divide-y divide-gray-200 mt-2">
           {data.map((place) => (
