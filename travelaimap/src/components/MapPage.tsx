@@ -189,7 +189,7 @@ export default function TravelMapPage({ showForm, setShowForm }: TravelMapPagePr
   }
 
   return (
-    <div className="relative flex flex-1 overflow-hidden h-[calc(100vh-64px)]">
+    <div className="flex flex-1 overflow-hidden h-[calc(100vh-64px)]">
 
       <MapComponent
         userLocation={userLocation}

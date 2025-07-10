@@ -103,7 +103,7 @@ export default function MapComponent({
       </MapContainer>
       <button
         onClick={centerOnUser}
-        className="absolute bottom-4 right-4 z-[9999] bg-white text-sm px-4 py-2 rounded shadow hover:bg-blue-100"
+        className="absolute bottom-4 right-4 z-[999] bg-white text-sm px-4 py-2 rounded shadow hover:bg-blue-100"
       >
         📍
       </button>
