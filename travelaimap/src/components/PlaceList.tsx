@@ -111,7 +111,16 @@ const renderSection = (key: string, title: string, data: Place[], editable: bool
                   e.stopPropagation();
                   toggleTooltip(key);
                 }}
-                className="text-gray-400 hover:text-gray-600 cursor-help focus:outline-none"
+                className="
+                  flex items-center justify-center
+                  w-5 h-5 rounded-full 
+                  bg-gray-200 hover:bg-gray-300
+                  text-gray-600 hover:text-gray-800
+                  text-xs font-medium
+                  cursor-help focus:outline-none
+                  transition-colors duration-200
+                "
+                aria-label="Показать подсказку"
               >
                 ?
               </button>
