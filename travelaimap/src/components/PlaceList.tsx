@@ -74,63 +74,93 @@ export default function PlacesList({
     }
   };
 
-  const renderSection = (key: string, title: string, data: Place[], editable: boolean) => {
-    const collapsed = collapsedSections[key];
+// Добавляем компонент Tooltip (можно создать отдельно или использовать готовый из библиотеки)
+const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }) => {
+  return (
+    <div className="relative group inline-flex items-center">
+      {children}
+      <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+        {text}
+        <span className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-0 border-t-4 border-gray-800 border-solid"></span>
+      </span>
+    </div>
+  );
+};
 
-    return (
-      <div className="p-4">
-        <button
-          onClick={() => toggleSection(key)}
-          className="flex justify-between items-center w-full text-left"
-        >
+// Модифицируем renderSection для добавления подсказок
+const renderSection = (key: string, title: string, data: Place[], editable: boolean) => {
+  const collapsed = collapsedSections[key];
+
+  // Определяем текст подсказки в зависимости от раздела
+  const tooltipText = 
+    key === 'nearby' 
+      ? 'Места, рекомендованные на основе вашей геолокации' 
+      : key === 'similar' 
+      ? 'Места, рекомендованные на основе тех, которые вы уже посетили' 
+      : '';
+
+  return (
+    <div className="p-4">
+      <button
+        onClick={() => toggleSection(key)}
+        className="flex justify-between items-center w-full text-left"
+      >
+        <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">{title}</h3>
-          <span className="text-gray-500 text-sm">{collapsed ? '▼' : '▲'}</span>
-        </button>
-        {!collapsed && (
-          <ul className="divide-y divide-gray-200 mt-2">
-            {data.map((place) => (
-              <li
-                key={`${place.id || place.name}-${place.city}`}
-                className="p-4 hover:bg-gray-100 cursor-pointer transition"
-                onClick={() => onSelectPlace(place)}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-medium">{place.name}</h4>
-                    <p className="text-sm text-gray-500">{place.city}</p>
-                  </div>
-                  {editable && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingPlace(place);
-                        }}
-                        className="text-green-500 cursor-pointer hover:text-green-700"
-                        title="Редактировать"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(place);
-                        }}
-                        className="text-red-500 cursor-pointer hover:text-red-700"
-                        title="Удалить"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  )}
+          {tooltipText && (
+            <Tooltip text={tooltipText}>
+              <span className="text-gray-400 hover:text-gray-600 cursor-help">?</span>
+            </Tooltip>
+          )}
+        </div>
+        <span className="text-gray-500 text-sm">{collapsed ? '▼' : '▲'}</span>
+      </button>
+      {/* Остальной код секции без изменений */}
+      {!collapsed && (
+        <ul className="divide-y divide-gray-200 mt-2">
+          {data.map((place) => (
+            <li
+              key={`${place.id || place.name}-${place.city}`}
+              className="p-4 hover:bg-gray-100 cursor-pointer transition"
+              onClick={() => onSelectPlace(place)}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-medium">{place.name}</h4>
+                  <p className="text-sm text-gray-500">{place.city}</p>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    );
-  };
+                {editable && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingPlace(place);
+                      }}
+                      className="text-green-500 cursor-pointer hover:text-green-700"
+                      title="Редактировать"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(place);
+                      }}
+                      className="text-red-500 cursor-pointer hover:text-red-700"
+                      title="Удалить"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
 
   return (
     <div className="w-1/3 bg-gray-50 border-l border-gray-200 overflow-y-auto flex flex-col">
